@@ -14,7 +14,7 @@ func (r *PaymentRouter) New() *PaymentRouter {
 	group := r.in.ApiService.GetStandardRouterGroup()
 
 	// 前綴
-	paymentPortalGroup := group.Group("/payment")
+	paymentPortalGroup := group.Group("/api/v1/payment")
 
 	paymentPortalGroup.POST("/notify", r.in.PaymentCtrl.Payment.NotifyPaymentResult)
 

@@ -10,7 +10,7 @@ type User struct {
 	Email            string          `gorm:"column:email;uniqueIndex:idx_email_phone" json:"email"`
 	PhoneCountryCode string          `gorm:"column:phone_country_code;uniqueIndex:idx_email_phone" json:"phoneCountryCode"`
 	PhoneNumber      string          `gorm:"column:phone_number;uniqueIndex:idx_email_phone" json:"phoneNumber"`
-	Status           enum.UserStatus `gorm:"column:status" json:"status"`
+	Status           enum.UserStatus `gorm:"type:varchar(20);column:status" json:"status"`
 	SecretKey        string          `gorm:"column:secret_key" json:"secretKey"`
 	At
 }

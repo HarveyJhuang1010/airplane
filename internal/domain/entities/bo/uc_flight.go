@@ -32,12 +32,12 @@ type Flight struct {
 }
 
 type CabinClass struct {
-	ID               int64
-	ClassCode        enum.CabinClassCode
-	Price            decimal.Decimal
-	BaggageAllowance int
-	Refundable       bool
-	SeatSelection    bool
-	MaxSeats         int
-	RemainSeats      int
+	ID               int64               `json:"id"`
+	ClassCode        enum.CabinClassCode `json:"classCode"`
+	Price            decimal.Decimal     `json:"price"`
+	BaggageAllowance int                 `json:"baggageAllowance"`
+	Refundable       bool                `json:"refundable"`
+	SeatSelection    bool                `json:"seatSelection"`
+	MaxSeats         int                 `json:"maxSeats"`
+	RemainSeats      int                 `json:"remainSeats"`
 }

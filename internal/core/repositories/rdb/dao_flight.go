@@ -115,7 +115,7 @@ func (dao *flightDao) list(cond *po.FlightListCond, pager *po.Pager) func(db *go
 
 		if !lo.IsNil(cond) && !lo.IsNil(cond.CanSell) && cond.CanSell {
 			db = db.Where("sellable_seats > 0")
-			db = db.Where("departure_time < ?", time.Now().Add(-time.Hour))
+			db = db.Where("departure_time > ?", time.Now().Add(-time.Hour))
 		}
 
 		if pager == nil {

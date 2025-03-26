@@ -45,15 +45,16 @@ func (k *Kafka) Produce(ctx context.Context, topic string, value []byte) error {
 }
 
 func (k *Kafka) Consume(ctx context.Context, groupID, topic string, handler func(context.Context, []byte) error) {
-	if groupID == "" {
-		groupID = "default"
+	if groupID == "" || topic == "" {
+		k.logger.Error(ctx, fmt.Errorf("groupID or topic is empty"))
+		return
 	}
+
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{k.config.Host},
-		GroupID:  groupID,
-		Topic:    topic,
-		MinBytes: 10e3, // 10KB
-		MaxBytes: 10e6, // 10MB
+		Brokers:     []string{k.config.Host},
+		GroupID:     groupID,
+		GroupTopics: []string{topic},
+		MaxBytes:    10e6, // 10MB
 	})
 	defer reader.Close()
 
@@ -72,6 +73,9 @@ func (k *Kafka) Consume(ctx context.Context, groupID, topic string, handler func
 				k.handleFailedMessage(ctx, topic, m)
 			}
 
+			if m.Value == nil {
+				continue
+			}
 			if err := handler(ctx, m.Value); err != nil {
 				k.logger.Error(ctx, err, zap.Any("message", m))
 				k.handleFailedMessage(ctx, topic, m)

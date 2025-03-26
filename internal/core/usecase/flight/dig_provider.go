@@ -1,6 +1,7 @@
 package flight
 
 import (
+	"airplane/internal/components/logger"
 	"airplane/internal/core/repositories/rdb"
 	"go.uber.org/dig"
 )
@@ -22,6 +23,7 @@ type dependence struct {
 type digIn struct {
 	dig.In
 
+	Logger       *logger.Loggers
 	DBRepository *rdb.Repository
 }
 

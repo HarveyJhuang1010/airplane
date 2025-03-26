@@ -1,14 +1,13 @@
 package flight
 
 import (
+	"airplane/internal/domain/entities/bo"
 	"airplane/internal/domain/entities/po"
 	"airplane/internal/errs"
+	"airplane/internal/tools/timelogger"
 	"context"
 	"github.com/jinzhu/copier"
 	"sync"
-
-	"airplane/internal/domain/entities/bo"
-	"airplane/internal/tools/timelogger"
 )
 
 func newListFlight(in dependence) *ListFlight {
@@ -53,7 +52,7 @@ func (uc *ListFlight) getFlights(ctx context.Context, cond *bo.ListFlightCond) (
 		pagePo           *po.Pagination
 	)
 	if cond != nil {
-		poCond := &po.FlightListCond{
+		poCond = &po.FlightListCond{
 			PreloadCabinClasses:  true,
 			DepartureAirport:     cond.DepartureAirport,
 			ArrivalAirport:       cond.ArrivalAirport,

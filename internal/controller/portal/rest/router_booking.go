@@ -13,7 +13,7 @@ type BookingRouter struct {
 func (r *BookingRouter) New() *BookingRouter {
 	group := r.in.ApiService.GetStandardRouterGroup()
 
-	bookingPortalGroup := group.Group("/booking")
+	bookingPortalGroup := group.Group("/api/v1/booking")
 	bookingPortalGroup.POST("", r.in.BookingCtrl.Booking.AddBooking)
 	bookingPortalGroup.GET("/:id", r.in.BookingCtrl.Booking.GetBooking)
 	bookingPortalGroup.DELETE("/:id", r.in.BookingCtrl.Booking.CancelBooking)

@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 func newConfirmBooking(in digIn) *ConfirmBooking {
@@ -27,7 +28,7 @@ func (uc *ConfirmBooking) ConfirmBooking(ctx context.Context, data []byte) error
 
 	cond := &bo.ConfirmBookingCond{}
 	if err := json.Unmarshal(data, cond); err != nil {
-		uc.in.Logger.AppLogger.Error(ctx, err)
+		uc.in.Logger.AppLogger.Error(ctx, err, zap.String("data", string(data)))
 		return errs.ErrParseFailed.TraceWrap(err)
 	}
 
