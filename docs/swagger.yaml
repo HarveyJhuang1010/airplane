@@ -1,0 +1,497 @@
+basePath: /api/v1
+definitions:
+  apis.Meta:
+    properties:
+      requestID:
+        example: 38df1107-94b9-498e-b24f-a0e82b77031b
+        type: string
+    type: object
+  apis.Pagination:
+    properties:
+      pi:
+        description: 頁碼 page index
+        type: integer
+      ps:
+        description: 筆數 page size
+        type: integer
+      total_page:
+        description: 總頁數 total pages
+        type: integer
+      total_row:
+        description: 總筆數 total items
+        type: integer
+    type: object
+  apis.StandardError:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  apis.StandardListResponse:
+    properties:
+      code:
+        description: PM 定義的 code
+        type: string
+      data:
+        description: 資料內容
+      error:
+        description: Error 資訊
+      meta:
+        allOf:
+        - $ref: '#/definitions/apis.Meta'
+        description: Response 的 Meta 資訊
+      pagination:
+        $ref: '#/definitions/apis.Pagination'
+    type: object
+  apis.StandardResponse:
+    properties:
+      code:
+        description: PM 定義的 code
+        type: string
+      data:
+        description: 資料內容
+      error:
+        description: Error 資訊
+      meta:
+        allOf:
+        - $ref: '#/definitions/apis.Meta'
+        description: Response 的 Meta 資訊
+    type: object
+  bookingpkg.AddBookingCond:
+    properties:
+      cabinClassID:
+        type: integer
+      countryCode:
+        type: string
+      email:
+        type: string
+      flightID:
+        type: integer
+      id:
+        type: integer
+      phoneNumber:
+        type: string
+      seatID:
+        type: integer
+    type: object
+  bookingpkg.BookingResponse:
+    properties:
+      airlineCode:
+        type: string
+      arrivalAirport:
+        type: string
+      arrivalTime:
+        type: string
+      baggageAllowance:
+        example: "0"
+        type: string
+      classCode:
+        enum:
+        - economy_standard
+        - economy_flex
+        - business_basic
+        - business_standard
+        type: string
+      departureAirport:
+        type: string
+      departureTime:
+        type: string
+      email:
+        type: string
+      expiredAt:
+        type: string
+      flightNumber:
+        type: string
+      id:
+        example: "0"
+        type: string
+      phoneCountryCode:
+        type: string
+      phoneNumber:
+        type: string
+      price:
+        type: number
+      refundable:
+        type: boolean
+      seatNumber:
+        type: string
+      seatSelection:
+        type: boolean
+      status:
+        enum:
+        - pending
+        - confirming
+        - confirmed
+        - failed
+        - cancelled
+        type: string
+    type: object
+  bookingpkg.EditBookingCond:
+    properties:
+      cabinClassID:
+        type: integer
+      seatID:
+        type: integer
+    type: object
+  flight.FlightResponse:
+    properties:
+      airlineCode:
+        description: 航空公司代碼
+        type: string
+      arrivalAirport:
+        description: 到達機場
+        type: string
+      arrivalTime:
+        description: 到達時間
+        type: string
+      departureAirport:
+        description: 出發機場
+        type: string
+      departureTime:
+        description: 出發時間
+        type: string
+      flightNumber:
+        description: 航班號碼
+        type: string
+      id:
+        description: Flight ID
+        example: "0"
+        type: string
+      status:
+        description: 航班狀態
+        enum:
+        - scheduled
+        - boarding
+        - departed
+        - arrived
+        - cancelled
+        type: string
+    type: object
+  payment.NotifyPaymentCond:
+    properties:
+      id:
+        description: Payment ID
+        example: "0"
+        type: string
+      paidAt:
+        description: Paid time
+        type: string
+      paymentMethod:
+        description: Payment Method
+        enum:
+        - credit_card
+        - debit_card
+        - bank_transfer
+        type: string
+      paymentProvider:
+        description: Payment Provider
+        enum:
+        - stripe
+        - paypal
+        - line_pay
+        - apple_pay
+        - google_pay
+        type: string
+      paymentStatus:
+        description: Payment Status
+        enum:
+        - pending
+        - success
+        - failed
+        - cancelled
+        type: string
+      transactionID:
+        description: 3rd Party Transaction ID
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a RESTFUL API documentation of Flight Booking System.
+  title: Airplane - Flight Booking System
+  version: 1.0.0
+paths:
+  /booking:
+    post:
+      consumes:
+      - application/json
+      description: user booking ticket
+      parameters:
+      - description: Request Body
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/bookingpkg.AddBookingCond'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/bookingpkg.BookingResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+      summary: user booking ticket
+      tags:
+      - Booking
+  /booking/:id:
+    delete:
+      consumes:
+      - application/json
+      description: user cancel booking ticket
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+      summary: user cancel booking ticket
+      tags:
+      - Booking
+    get:
+      consumes:
+      - application/json
+      description: user get booking ticket
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/bookingpkg.BookingResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+      summary: user get booking ticket
+      tags:
+      - Booking
+    patch:
+      consumes:
+      - application/json
+      description: 'user edit booking ticket. ex: change seat'
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/bookingpkg.EditBookingCond'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/bookingpkg.BookingResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+      summary: user edit booking ticket
+      tags:
+      - Booking
+  /flight:
+    get:
+      consumes:
+      - application/json
+      description: get flight list
+      parameters:
+      - description: 到達機場
+        in: query
+        name: arrivalAirport
+        type: string
+      - description: 出發機場
+        in: query
+        name: departureAirport
+        type: string
+      - description: 出發時間結束(YYYY-MM-DDTHH:MM:SSZ)
+        in: query
+        name: departureTimeEndAt
+        type: string
+      - description: 出發時間起始(YYYY-MM-DDTHH:MM:SSZ)
+        in: query
+        name: departureTimeStartAt
+        type: string
+      - description: 頁碼 page index
+        in: query
+        name: pi
+        type: integer
+      - description: 筆數 page size
+        in: query
+        name: ps
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardListResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/flight.FlightResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+      summary: get flight list
+      tags:
+      - Flight
+  /payment/notify:
+    post:
+      consumes:
+      - application/json
+      description: 3rd party payment gateway will call this API to notify payment
+        result
+      parameters:
+      - description: Request Body
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/payment.NotifyPaymentCond'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/apis.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/apis.StandardResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/apis.StandardError'
+              type: object
+      summary: Notify Payment Result
+      tags:
+      - Payment
+schemes:
+- http
+swagger: "2.0"

@@ -1,0 +1,38 @@
+@startuml
+actor User
+participant "nginx (gateway)" as NGINX
+participant "booking_service" as BookingAPI
+participant "payment_service" as PaymentAPI
+participant "3rd-Party Gateway" as Gateway
+participant "mysql" as MySQL
+participant "kafka" as Kafka
+participant "qworker_service" as Worker
+
+== Step 1: User completes payment ==
+User -> Gateway: Confirm payment on 3rd-party page
+
+== Step 2: Payment provider notifies webhook ==
+Gateway -> PaymentAPI: POST /payment/notify
+PaymentAPI -> PaymentAPI: Parse NotifyPaymentCond
+PaymentAPI -> MySQL: ConfirmPayment()
+
+MySQL --> PaymentAPI: Booking Info
+PaymentAPI -> Kafka: Produce(ConfirmBookingCond)
+
+== Step 3: Worker processes ConfirmBooking ==
+Kafka -> Worker: ConfirmBookingCond
+
+Worker -> MySQL: Transaction
+note left
+  1. Get Booking
+  2. Check status == Pending?
+  3. Get CabinClass
+  - if RemainSeats > 0: Confirmed
+  - else: Overbooked
+  4. Update CabinClass
+  5. Get Seat
+    - if Seat available: Book Seat
+    - if failed: Overbooked + CancelSeat
+  6. Update Booking Status
+end note
+@enduml

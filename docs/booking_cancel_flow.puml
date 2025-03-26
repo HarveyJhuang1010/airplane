@@ -1,0 +1,36 @@
+@startuml
+actor User
+participant "nginx (gateway)" as NGINX
+participant "booking_service" as BookingAPI
+participant "mysql" as MySQL
+participant "payment_service" as Payment
+
+== Step 1: User sends cancel request ==
+User -> NGINX: DELETE /booking/:id
+NGINX -> BookingAPI: CancelBooking(id)
+
+== Step 2: Booking service fetches booking ==
+BookingAPI -> MySQL: BookingDAO().Get(id)
+MySQL --> BookingAPI: Booking
+
+alt status is Cancelled or Expired
+    BookingAPI --> User: 400 Bad Request (StatusNotMatch)
+else
+    BookingAPI -> MySQL: Transaction
+    note right
+        1. Update booking status to Cancelled
+        2. Update flight sellable seats
+        3. Check if booking status is Confirmed or Overbooked
+            - Confirmed or Overbooked:
+                1. Refund Payment
+                2. Update CabinClass RemainSeats(+1)
+                3. Update Seat Status to Available
+                    - remain > 0 then:
+                        1. Get Other Overbooked Booking
+                        2. Update Booking status to Confirmed
+                    - SeatID exists then: Update Seat Status to Available
+            -  Pending: Cancel Payment
+    end note
+    BookingAPI --> User: 204 No Content
+end
+@enduml

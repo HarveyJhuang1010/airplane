@@ -1,0 +1,26 @@
+@startuml
+participant "cron_service" as Cron
+participant "mysql" as MySQL
+participant "payment_service" as Payment
+
+== Step 1: Cron job triggers every 5 min ==
+Cron -> Cron: Check Booking
+
+== Step 2: Booking service queries for expired ==
+Cron -> MySQL: Get Expired Booking
+MySQL --> Cron: List of expired bookings
+
+== Step 3: For each expired booking ==
+loop expired bookings
+  Cron -> MySQL: Transaction
+  note right
+    1. Update Booking Status to Expired
+    2. Get Flight Info
+    3. Update Flight SellableSeats+1
+    4. Cancel Payment
+  end note
+end
+
+== Step 4: Notify complete ==
+BookingDB --> Cron: done
+@enduml

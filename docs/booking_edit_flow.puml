@@ -1,0 +1,41 @@
+@startuml
+actor User
+participant "nginx (gateway)" as NGINX
+participant "booking_service" as BookingAPI
+participant "mysql" as MySQL
+participant "payment_service" as Payment
+
+== Step 1: User sends edit request ==
+User -> NGINX: PATCH /booking/:id
+NGINX -> BookingAPI: EditBooking(cond)
+
+== Step 2: Booking service validates and fetches booking ==
+BookingAPI -> MySQL: Get Booking by ID
+MySQL --> BookingAPI: Booking
+
+alt status != Confirmed or Overbooked
+    BookingAPI --> User: 400 StatusNotMatch
+else
+    BookingAPI -> MySQL: Get New Seat by Seat ID
+    BookingAPI -> MySQL: Get New Class by Class ID
+    alt newSeat not available or mismatched cabin
+        BookingAPI --> User: 400 Bad Request
+    else
+        alt Price changed
+            BookingAPI -> MySQL: Get Payment by Booking ID
+            BookingAPI -> MySQL: Create Extra Payment
+            BookingAPI -> MySQL: Update Seat Status to Held
+            BookingAPI -> MySQL: Update Booking Status to Confirming
+        else
+            BookingAPI -> MySQL: Update Seat Status to Booked
+            BookingAPI -> MySQL: Update Booking Status to Confirmed
+        end
+    end
+end
+
+== Step 3: Booking Service returns updated booking ==
+BookingAPI -> MySQL: BookingDAO().Get(id)
+MySQL --> BookingAPI: Booking
+BookingAPI --> NGINX: BookingResponse
+NGINX --> User: BookingResponse
+@enduml

@@ -1,0 +1,51 @@
+env: "local"
+ver: "1.0.0"
+
+database:
+  dbName: exchange
+  dialect: mysql
+  host: 0.0.0.0
+  logLevel: 4
+  maxIdleConns: 10
+  maxLifeTime: 14400
+  maxOpenConns: 100
+  password: '123123'
+  port: 3306
+  user: root
+logger:
+  appLogger: info
+  named:
+    - defaultResponseLogger: error
+    - userApiV1: debug
+    - adminApiV1: debug
+  sysLogger: info
+redis:
+  ca: ''
+  db: 0
+  host: 0.0.0.0
+  password: ''
+  port: 6379
+rest:
+  allowHeaders:
+    - Origin
+    - Authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - X-LOGIN-TOKEN
+  allowMethods:
+    - GET
+    - HEAD
+    - POST
+    - PUT
+    - PATCH
+    - OPTIONS
+  allowOrigins:
+    - '*'
+  port: 8080
+  exposeHeaders:
+    - Content-Length
+    - Access-Control-Allow-Origin
+  listenAddress: 0.0.0.0
+  trace: true
+kafka:
+  host: localhost:9092

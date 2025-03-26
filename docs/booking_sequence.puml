@@ -1,0 +1,51 @@
+@startuml
+actor User
+participant "nginx (gateway)" as NGINX
+participant "booking_service" as BookingAPI
+participant "redis" as Redis
+participant "mysql" as MySQL
+participant "kafka" as Kafka
+participant "qworker_service" as Worker
+participant "payment_service" as Payment
+
+== Step 1: User calls AddBooking ==
+User -> NGINX: POST /api/booking
+NGINX -> BookingAPI: AddBooking()
+
+== Step 2: Booking service checks Redis for sellable seats ==
+BookingAPI -> Redis: FlightMaxSellCount.Exist()
+alt not exists
+  BookingAPI -> MySQL: FlightDAO().Get()
+  MySQL --> BookingAPI: Flight
+  BookingAPI -> Redis: SetCount(flight.SellableSeats)
+end
+
+BookingAPI -> Redis: DecrCount()
+alt value < 0
+  BookingAPI --> User: 409 Sold Out
+end
+
+== Step 3: Publish booking intent to Kafka ==
+BookingAPI -> Kafka: Produce(AddBookingCond)
+
+== Step 4: Worker consumes AddBooking ==
+Kafka -> Worker: AddBookingCond
+
+== Step 5: Worker processes booking ==
+Worker -> MySQL: FlightDAO().Get()
+alt expired / sold out
+  Worker --> Kafka: Skip booking
+end
+Worker -> MySQL: UpdateSellableSeats()
+
+Worker -> MySQL: CabinClassDAO().Get()
+Worker -> MySQL: UserDAO().GetUser()
+
+Worker -> Payment: CreatePayment()
+Payment --> Worker: Payment created
+
+Worker -> MySQL: BookingDAO().Create()
+MySQL --> Worker: OK
+
+Worker --> Kafka: Booking Done
+@enduml
