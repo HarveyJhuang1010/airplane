@@ -1,0 +1,148 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: local_gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - booking_service
+      - payment_service
+      - flight_service
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka_broker
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    depends_on:
+      - zookeeper
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  cron_service:
+    build: ./images/cron
+    container_name: cron_service
+    expose:
+      - "8081"
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  qworker_service:
+    build: ./images/qworker
+    container_name: qworker_service
+    expose:
+      - "8082"
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  booking_service:
+    build: ./images/booking
+    container_name: booking_service
+    expose:
+      - "8083"
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  payment_service:
+    build: ./images/payment
+    container_name: payment_service
+    expose:
+      - "8084"
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+  flight_service:
+    build: ./images/flight
+    container_name: flight_service
+    expose:
+      - "8085"
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    networks:
+      - airplane_net
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  airplane_net:
+    driver: bridge
