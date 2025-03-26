@@ -31,7 +31,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,95 +53,151 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
     networks:
       - airplane_net
     restart: unless-stopped
 
   kafka:
-    image: bitnami/kafka:latest
-    container_name: kafka_broker
+    image: bitnami/kafka:2.7.0
+    container_name: kafka
     ports:
       - "9092:9092"
       - "29092:29092"
     environment:
       KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: "yes"
     depends_on:
       - zookeeper
     networks:
       - airplane_net
     restart: unless-stopped
 
+  kafka_topic_init:
+    image: bitnami/kafka:2.7.0
+    container_name: kafka_topic_init
+    depends_on:
+      - kafka
+    entrypoint: [ "/bin/bash", "-c" ]
+    command: >
+      "sleep 10 &&
+       kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic add-booking &&
+       kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic confirm-booking &&
+       kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic failed-add-booking &&
+       kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic failed-confirm-booking"
+    networks:
+      - airplane_net
+    restart: "no"
+
   cron_service:
-    build: ./images/cron
+    build:
+      context: .
+      dockerfile: ./images/cron/Dockerfile
     container_name: cron_service
     expose:
       - "8081"
     depends_on:
-      - mysql
-      - redis
-      - kafka
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka_topic_init:
+        condition: service_completed_successfully
     networks:
       - airplane_net
     restart: unless-stopped
 
+
   qworker_service:
-    build: ./images/qworker
+    build:
+      context: .
+      dockerfile: ./images/qworker/Dockerfile
     container_name: qworker_service
     expose:
       - "8082"
     depends_on:
-      - mysql
-      - redis
-      - kafka
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka_topic_init:
+        condition: service_completed_successfully
     networks:
       - airplane_net
     restart: unless-stopped
 
   booking_service:
-    build: ./images/booking
+    build:
+      context: .
+      dockerfile: ./images/booking/Dockerfile
     container_name: booking_service
     expose:
-      - "8083"
+      - "8080"
     depends_on:
-      - mysql
-      - redis
-      - kafka
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka_topic_init:
+        condition: service_completed_successfully
     networks:
       - airplane_net
     restart: unless-stopped
 
   payment_service:
-    build: ./images/payment
+    build:
+      context: .
+      dockerfile: ./images/payment/Dockerfile
     container_name: payment_service
     expose:
-      - "8084"
+      - "8080"
     depends_on:
-      - mysql
-      - redis
-      - kafka
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka_topic_init:
+        condition: service_completed_successfully
     networks:
       - airplane_net
     restart: unless-stopped
 
   flight_service:
-    build: ./images/flight
+    build:
+      context: .
+      dockerfile: ./images/flight/Dockerfile
     container_name: flight_service
     expose:
-      - "8085"
+      - "8080"
     depends_on:
-      - mysql
-      - redis
-      - kafka
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka_topic_init:
+        condition: service_completed_successfully
     networks:
       - airplane_net
     restart: unless-stopped
 
 volumes:
   mysql_data:
+  kafka_data:
 
 networks:
   airplane_net:

@@ -1,0 +1,60 @@
+### Get Flight List
+GET http://localhost/api/v1/flight
+Accept: application/json
+
+###
+GET http://localhost/api/v1/flight?departureAirport=NRT&arrivalAirport=KIX&departureTimeStartAt=2025-04-01T00:00:00Z&departureTimeEndAt=2025-04-01T23:59:59Z&pi=1&ps=10
+Accept: application/json
+
+###
+
+### Create Booking
+POST http://localhost/api/v1/booking
+Content-Type: application/json
+
+{
+  "flightID": 100001,
+  "cabinClassID": 200001,
+  "email": "test@example.com",
+  "countryCode": "886",
+  "phoneNumber": "912345678",
+  "seatID": 300001
+}
+
+###
+
+### Get Booking
+GET http://localhost/api/v1/booking/100001
+Accept: application/json
+
+###
+
+### Edit Booking
+PATCH http://localhost/api/v1/booking/100001
+Content-Type: application/json
+
+{
+  "cabinClassID": 200002,
+  "seatID": 300002
+}
+
+###
+
+### Cancel Booking
+DELETE http://localhost/api/v1/booking/100001
+Accept: application/json
+
+###
+
+### Notify Payment
+POST http://localhost/api/v1/payment/notify
+Content-Type: application/json
+
+{
+  "id": "400001",
+  "paidAt": "2025-03-26T13:00:00Z",
+  "paymentMethod": "credit_card",
+  "paymentProvider": "stripe",
+  "paymentStatus": "success",
+  "transactionID": "txn_123456789"
+}

@@ -1,4 +1,4 @@
-FROM golang:1.22.1-alpine3.19 AS builder
+FROM golang:1.24-alpine3.21 AS builder
 
 WORKDIR /app
 COPY go.mod .
@@ -10,13 +10,13 @@ COPY main.go .
 RUN go build -o ./build/server
 
 
-FROM alpine:3.19
+FROM alpine:3.21
 
 # Install time zone package
 RUN apk add --update-cache tzdata
 
 # Copy binary
-workdir /app
+WORKDIR /app
 COPY --from=builder /app/build/server /app/server
 COPY ./config /app/config
 COPY ./docs /app/docs

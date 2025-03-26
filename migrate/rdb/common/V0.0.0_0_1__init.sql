@@ -1,5 +1,5 @@
--- Users Table
-CREATE TABLE users
+-- user Table
+CREATE TABLE user
 (
     id                 BIGINT PRIMARY KEY,
     email              VARCHAR(255),
@@ -13,8 +13,8 @@ CREATE TABLE users
     UNIQUE KEY idx_email_phone (email, phone_country_code, phone_number)
 );
 
--- Flights Table
-CREATE TABLE flights
+-- flight Table
+CREATE TABLE flight
 (
     id                BIGINT PRIMARY KEY,
     airline_code      VARCHAR(10) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE flights
 );
 
 -- Cabin Classes Table
-CREATE TABLE cabin_classes
+CREATE TABLE cabin_class
 (
     id                BIGINT PRIMARY KEY,
     flight_id         BIGINT         NOT NULL,
@@ -51,11 +51,11 @@ CREATE TABLE cabin_classes
     updated_at        DATETIME,
     deleted_at        DATETIME                DEFAULT NULL,
     INDEX (flight_id),
-    FOREIGN KEY (flight_id) REFERENCES flights (id) ON UPDATE RESTRICT ON DELETE RESTRICT
+    FOREIGN KEY (flight_id) REFERENCES flight (id) ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
--- Seats Table
-CREATE TABLE seats
+-- seat Table
+CREATE TABLE seat
 (
     id             BIGINT PRIMARY KEY,
     flight_id      BIGINT      NOT NULL,
@@ -67,12 +67,12 @@ CREATE TABLE seats
     deleted_at     DATETIME DEFAULT NULL,
     INDEX (flight_id),
     INDEX (cabin_class_id),
-    FOREIGN KEY (cabin_class_id) REFERENCES cabin_classes (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    FOREIGN KEY (flight_id) REFERENCES flights (id)
+    FOREIGN KEY (cabin_class_id) REFERENCES cabin_class (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    FOREIGN KEY (flight_id) REFERENCES flight (id)
 );
 
--- Bookings Table
-CREATE TABLE bookings
+-- booking Table
+CREATE TABLE booking
 (
     id             BIGINT PRIMARY KEY,
     flight_id      BIGINT         NOT NULL,
@@ -88,14 +88,14 @@ CREATE TABLE bookings
     INDEX (flight_id),
     INDEX (user_id),
     INDEX (seat_id),
-    FOREIGN KEY (flight_id) REFERENCES flights (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    FOREIGN KEY (cabin_class_id) REFERENCES cabin_classes (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    FOREIGN KEY (seat_id) REFERENCES seats (id) ON UPDATE SET NULL ON DELETE SET NULL
+    FOREIGN KEY (flight_id) REFERENCES flight (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    FOREIGN KEY (cabin_class_id) REFERENCES cabin_class (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    FOREIGN KEY (seat_id) REFERENCES seat (id) ON UPDATE SET NULL ON DELETE SET NULL
 );
 
--- Payments Table
-CREATE TABLE payments
+-- payment Table
+CREATE TABLE payment
 (
     id               BIGINT PRIMARY KEY,
     booking_id       BIGINT         NOT NULL UNIQUE,
@@ -113,13 +113,13 @@ CREATE TABLE payments
     updated_at       DATETIME,
     deleted_at       DATETIME    DEFAULT NULL,
     INDEX (user_id),
-    FOREIGN KEY (booking_id) REFERENCES bookings (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE RESTRICT ON DELETE RESTRICT
+    FOREIGN KEY (booking_id) REFERENCES booking (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
 
--- Extra Payments Table
-CREATE TABLE extra_payments
+-- Extra payment Table
+CREATE TABLE extra_payment
 (
     id               BIGINT PRIMARY KEY,
     booking_id       BIGINT         NOT NULL UNIQUE,
@@ -137,6 +137,6 @@ CREATE TABLE extra_payments
     updated_at       DATETIME,
     deleted_at       DATETIME    DEFAULT NULL,
     INDEX (user_id),
-    FOREIGN KEY (booking_id) REFERENCES bookings (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE RESTRICT ON DELETE RESTRICT
+    FOREIGN KEY (booking_id) REFERENCES booking (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE RESTRICT ON DELETE RESTRICT
 );

@@ -15,7 +15,7 @@ Airplane is a high-performance flight booking system designed to handle high tra
 ## System Architecture
 The system is designed using a microservices approach, with the following key components:
 
-![System Architecture](./docs/system_architecture.puml)
+![System Architecture](./docs/system_architecture.png)
 
 1. **Flight Portal Service**: Handles searching for flights based on user criteria.
 2. **Booking Portal Service**: Handles booking tickets based on user criteria.

@@ -712,6 +712,45 @@ const docTemplate = `{
                 }
             }
         },
+        "flight.CabinClassResponse": {
+            "type": "object",
+            "properties": {
+                "baggageAllowance": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "classCode": {
+                    "type": "string",
+                    "enum": [
+                        "economy_standard",
+                        "economy_flex",
+                        "business_basic",
+                        "business_standard"
+                    ]
+                },
+                "id": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "maxSeats": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "refundable": {
+                    "type": "boolean"
+                },
+                "remainSeats": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "seatSelection": {
+                    "type": "boolean"
+                }
+            }
+        },
         "flight.FlightResponse": {
             "type": "object",
             "properties": {
@@ -727,6 +766,13 @@ const docTemplate = `{
                     "description": "到達時間",
                     "type": "string"
                 },
+                "cabinClasses": {
+                    "description": "艙等",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/flight.CabinClassResponse"
+                    }
+                },
                 "departureAirport": {
                     "description": "出發機場",
                     "type": "string"
@@ -741,6 +787,11 @@ const docTemplate = `{
                 },
                 "id": {
                     "description": "Flight ID",
+                    "type": "string",
+                    "example": "0"
+                },
+                "sellableSeats": {
+                    "description": "可售座位數",
                     "type": "string",
                     "example": "0"
                 },

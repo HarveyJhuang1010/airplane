@@ -1,6 +1,6 @@
 module airplane
 
-go 1.24.0
+go 1.24.1
 
 require (
 	github.com/JGLTechnologies/gin-rate-limit v1.5.4
@@ -19,7 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.3
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.49.1
-	github.com/segmentio/kafka-go v0.4.47
+	github.com/segmentio/kafka-go v0.4.45
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.0

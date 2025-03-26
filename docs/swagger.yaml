@@ -134,6 +134,34 @@ definitions:
       seatID:
         type: integer
     type: object
+  flight.CabinClassResponse:
+    properties:
+      baggageAllowance:
+        example: "0"
+        type: string
+      classCode:
+        enum:
+        - economy_standard
+        - economy_flex
+        - business_basic
+        - business_standard
+        type: string
+      id:
+        example: "0"
+        type: string
+      maxSeats:
+        example: "0"
+        type: string
+      price:
+        type: number
+      refundable:
+        type: boolean
+      remainSeats:
+        example: "0"
+        type: string
+      seatSelection:
+        type: boolean
+    type: object
   flight.FlightResponse:
     properties:
       airlineCode:
@@ -145,6 +173,11 @@ definitions:
       arrivalTime:
         description: 到達時間
         type: string
+      cabinClasses:
+        description: 艙等
+        items:
+          $ref: '#/definitions/flight.CabinClassResponse'
+        type: array
       departureAirport:
         description: 出發機場
         type: string
@@ -156,6 +189,10 @@ definitions:
         type: string
       id:
         description: Flight ID
+        example: "0"
+        type: string
+      sellableSeats:
+        description: 可售座位數
         example: "0"
         type: string
       status:

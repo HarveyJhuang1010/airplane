@@ -2,16 +2,16 @@ env: "local"
 ver: "1.0.0"
 
 database:
-  dbName: exchange
+  dbName: airplane
   dialect: mysql
-  host: 0.0.0.0
+  host: mysql
   logLevel: 4
   maxIdleConns: 10
   maxLifeTime: 14400
   maxOpenConns: 100
-  password: '123123'
+  password: 'airplanepass'
   port: 3306
-  user: root
+  user: airplane
 logger:
   appLogger: info
   named:
@@ -22,7 +22,7 @@ logger:
 redis:
   ca: ''
   db: 0
-  host: 0.0.0.0
+  host: redis
   password: ''
   port: 6379
 rest:
@@ -48,4 +48,4 @@ rest:
   listenAddress: 0.0.0.0
   trace: true
 kafka:
-  host: localhost:9092
+  host: kafka:9092
