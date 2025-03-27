@@ -79,6 +79,10 @@ Please refer to the [Swagger API documentation](./docs/swagger.yaml) for detaile
    make migrate-local
    ```
 
+## Testing
+- unit tests: to be added
+- api tests: please refer to the [api-test.http](./scripts/api-test.http) for detailed information on the available tests.
+
 ## License
 This project is licensed under the MIT License.
 

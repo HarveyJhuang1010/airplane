@@ -74,9 +74,9 @@ Table payments {
   id BIGINT [pk]
   booking_id BIGINT [unique]
   user_id BIGINT
-  payment_provider VARCHAR(50)
-  payment_method VARCHAR(50)
-  payment_status VARCHAR(20)
+  provider VARCHAR(50)
+  method VARCHAR(50)
+  status VARCHAR(20)
   amount DECIMAL(10,2)
   currency VARCHAR(10)
   transaction_id VARCHAR(100)
@@ -92,9 +92,9 @@ Table extra_payments {
   id BIGINT [pk]
   booking_id BIGINT [unique]
   user_id BIGINT
-  payment_provider VARCHAR(50)
-  payment_method VARCHAR(50)
-  payment_status VARCHAR(20)
+  provider VARCHAR(50)
+  method VARCHAR(50)
+  status VARCHAR(20)
   amount DECIMAL(10,2)
   currency VARCHAR(10)
   transaction_id VARCHAR(100)
