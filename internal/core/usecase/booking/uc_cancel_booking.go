@@ -7,6 +7,7 @@ import (
 	"airplane/internal/errs"
 	"airplane/internal/tools/timelogger"
 	"context"
+	"github.com/samber/lo"
 )
 
 func newCancelBooking(in digIn) *CancelBooking {
@@ -29,7 +30,11 @@ func (uc *CancelBooking) CancelBooking(ctx context.Context, id int64) error {
 			return err
 		}
 
-		if booking.Status == enum.BookingStatusCancelled || booking.Status == enum.BookingStatusExpired {
+		if lo.Contains([]enum.BookingStatus{
+			enum.BookingStatusConfirming,
+			enum.BookingStatusCancelled,
+			enum.BookingStatusExpired,
+		}, booking.Status) {
 			return errs.ErrStatusNotMatch
 		}
 
@@ -55,7 +60,7 @@ func (uc *CancelBooking) CancelBooking(ctx context.Context, id int64) error {
 			return err
 		}
 
-		if booking.Status == enum.BookingStatusConfirmed || booking.Status == enum.BookingStatusOverbooked {
+		if lo.Contains([]enum.BookingStatus{enum.BookingStatusConfirmed, enum.BookingStatusOverbooked}, booking.Status) {
 			// refund the payment
 			if err := uc.in.Payment.RefundPayment.RefundPayment(ctx, tx, booking.ID); err != nil {
 				uc.in.Logger.AppLogger.Error(ctx, err)
@@ -87,13 +92,13 @@ func (uc *CancelBooking) CancelBooking(ctx context.Context, id int64) error {
 			if booking.SeatID != nil {
 				if err := tx.SeatDAO().Update(ctx, &po.SeatUpdateCond{
 					ID:     *booking.SeatID,
-					Status: enum.SeatStatusAvailable,
+					Status: enum.SeatStatusHeld,
 				}); err != nil {
 					uc.in.Logger.AppLogger.Error(ctx, err)
 					return err
 				}
 			}
-		} else if booking.Status == enum.BookingStatusPending {
+		} else {
 			// cancel the payment
 			if err := uc.in.Payment.CancelPayment.CancelPayment(ctx, tx, booking.ID); err != nil {
 				uc.in.Logger.AppLogger.Error(ctx, err)

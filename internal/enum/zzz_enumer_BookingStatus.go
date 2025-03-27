@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-const _BookingStatusName = "pendingconfirmedcancelledexpiredoverbookedconfirming"
+const _BookingStatusName = "pendingconfirmingconfirmedcancelingcancelledexpiredoverbooked"
 
-var _BookingStatusIndex = [...]uint8{0, 7, 16, 25, 32, 42, 52}
+var _BookingStatusIndex = [...]uint8{0, 7, 17, 26, 35, 44, 51, 61}
 
-const _BookingStatusLowerName = "pendingconfirmedcancelledexpiredoverbookedconfirming"
+const _BookingStatusLowerName = "pendingconfirmingconfirmedcancelingcancelledexpiredoverbooked"
 
 func (i BookingStatus) String() string {
 	if i < 0 || i >= BookingStatus(len(_BookingStatusIndex)-1) {
@@ -27,37 +27,41 @@ func (i BookingStatus) String() string {
 func _BookingStatusNoOp() {
 	var x [1]struct{}
 	_ = x[BookingStatusPending-(0)]
-	_ = x[BookingStatusConfirmed-(1)]
-	_ = x[BookingStatusCancelled-(2)]
-	_ = x[BookingStatusExpired-(3)]
-	_ = x[BookingStatusOverbooked-(4)]
-	_ = x[BookingStatusConfirming-(5)]
+	_ = x[BookingStatusConfirming-(1)]
+	_ = x[BookingStatusConfirmed-(2)]
+	_ = x[BookingStatusCanceling-(3)]
+	_ = x[BookingStatusCancelled-(4)]
+	_ = x[BookingStatusExpired-(5)]
+	_ = x[BookingStatusOverbooked-(6)]
 }
 
-var _BookingStatusValues = []BookingStatus{BookingStatusPending, BookingStatusConfirmed, BookingStatusCancelled, BookingStatusExpired, BookingStatusOverbooked, BookingStatusConfirming}
+var _BookingStatusValues = []BookingStatus{BookingStatusPending, BookingStatusConfirming, BookingStatusConfirmed, BookingStatusCanceling, BookingStatusCancelled, BookingStatusExpired, BookingStatusOverbooked}
 
 var _BookingStatusNameToValueMap = map[string]BookingStatus{
 	_BookingStatusName[0:7]:        BookingStatusPending,
 	_BookingStatusLowerName[0:7]:   BookingStatusPending,
-	_BookingStatusName[7:16]:       BookingStatusConfirmed,
-	_BookingStatusLowerName[7:16]:  BookingStatusConfirmed,
-	_BookingStatusName[16:25]:      BookingStatusCancelled,
-	_BookingStatusLowerName[16:25]: BookingStatusCancelled,
-	_BookingStatusName[25:32]:      BookingStatusExpired,
-	_BookingStatusLowerName[25:32]: BookingStatusExpired,
-	_BookingStatusName[32:42]:      BookingStatusOverbooked,
-	_BookingStatusLowerName[32:42]: BookingStatusOverbooked,
-	_BookingStatusName[42:52]:      BookingStatusConfirming,
-	_BookingStatusLowerName[42:52]: BookingStatusConfirming,
+	_BookingStatusName[7:17]:       BookingStatusConfirming,
+	_BookingStatusLowerName[7:17]:  BookingStatusConfirming,
+	_BookingStatusName[17:26]:      BookingStatusConfirmed,
+	_BookingStatusLowerName[17:26]: BookingStatusConfirmed,
+	_BookingStatusName[26:35]:      BookingStatusCanceling,
+	_BookingStatusLowerName[26:35]: BookingStatusCanceling,
+	_BookingStatusName[35:44]:      BookingStatusCancelled,
+	_BookingStatusLowerName[35:44]: BookingStatusCancelled,
+	_BookingStatusName[44:51]:      BookingStatusExpired,
+	_BookingStatusLowerName[44:51]: BookingStatusExpired,
+	_BookingStatusName[51:61]:      BookingStatusOverbooked,
+	_BookingStatusLowerName[51:61]: BookingStatusOverbooked,
 }
 
 var _BookingStatusNames = []string{
 	_BookingStatusName[0:7],
-	_BookingStatusName[7:16],
-	_BookingStatusName[16:25],
-	_BookingStatusName[25:32],
-	_BookingStatusName[32:42],
-	_BookingStatusName[42:52],
+	_BookingStatusName[7:17],
+	_BookingStatusName[17:26],
+	_BookingStatusName[26:35],
+	_BookingStatusName[35:44],
+	_BookingStatusName[44:51],
+	_BookingStatusName[51:61],
 }
 
 // BookingStatusString retrieves an enum value from the enum constants string name.

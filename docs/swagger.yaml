@@ -75,6 +75,11 @@ definitions:
       seatID:
         type: integer
     type: object
+  bookingpkg.AddBookingResponse:
+    properties:
+      id:
+        type: integer
+    type: object
   bookingpkg.BookingResponse:
     properties:
       airlineCode:
@@ -211,17 +216,17 @@ definitions:
         description: Payment ID
         example: "0"
         type: string
-      paidAt:
-        description: Paid time
-        type: string
-      paymentMethod:
+      method:
         description: Payment Method
         enum:
         - credit_card
         - debit_card
         - bank_transfer
         type: string
-      paymentProvider:
+      paidAt:
+        description: Paid time
+        type: string
+      provider:
         description: Payment Provider
         enum:
         - stripe
@@ -230,7 +235,7 @@ definitions:
         - apple_pay
         - google_pay
         type: string
-      paymentStatus:
+      status:
         description: Payment Status
         enum:
         - pending
@@ -264,14 +269,14 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             allOf:
             - $ref: '#/definitions/apis.StandardResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/bookingpkg.BookingResponse'
+                  $ref: '#/definitions/bookingpkg.AddBookingResponse'
               type: object
         "400":
           description: Bad Request

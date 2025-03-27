@@ -7,18 +7,18 @@ import (
 )
 
 type Payment struct {
-	ID              int64                 `gorm:"primaryKey" json:"id"`
-	BookingID       int64                 `gorm:"uniqueIndex;not null" json:"bookingID"`
-	UserID          int64                 `gorm:"not null;index" json:"userID"`
-	PaymentProvider *enum.PaymentProvider `gorm:"type:varchar(50);not null" json:"paymentProvider"`
-	PaymentMethod   *enum.PaymentMethod   `gorm:"type:varchar(50);not null" json:"paymentMethod"`
-	PaymentStatus   enum.PaymentStatus    `gorm:"type:varchar(20);not null" json:"paymentStatus"`
-	Amount          decimal.Decimal       `gorm:"type:decimal(10,2);not null" json:"amount"`
-	Currency        string                `gorm:"type:varchar(10);default:'TWD'" json:"currency"`
-	TransactionID   *string               `gorm:"type:varchar(100)" json:"transactionID"`
-	PaymentURL      string                `gorm:"type:text" json:"paymentURL"`
-	ExpiredAt       time.Time             `gorm:"not null" json:"expiredAt"`
-	PaidAt          *time.Time            `json:"paid_at,omitempty" json:"paidAt"`
+	ID            int64                 `gorm:"primaryKey" json:"id"`
+	BookingID     int64                 `gorm:"uniqueIndex;not null" json:"bookingID"`
+	UserID        int64                 `gorm:"not null;index" json:"userID"`
+	Provider      *enum.PaymentProvider `gorm:"type:varchar(50);default null" json:"provider"`
+	Method        *enum.PaymentMethod   `gorm:"type:varchar(50);default null" json:"method"`
+	Status        enum.PaymentStatus    `gorm:"type:varchar(20);not null" json:"status"`
+	Amount        decimal.Decimal       `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency      string                `gorm:"type:varchar(10);default:'TWD'" json:"currency"`
+	TransactionID *string               `gorm:"type:varchar(100)" json:"transactionID"`
+	PaymentURL    string                `gorm:"type:text" json:"paymentURL"`
+	ExpiredAt     time.Time             `gorm:"not null" json:"expiredAt"`
+	PaidAt        *time.Time            `json:"paid_at,omitempty" json:"paidAt"`
 
 	Booking Booking `gorm:"foreignKey:BookingID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	User    User    `gorm:"foreignKey:UserID;constraint:OnUpdate:RESTRICT,OnDelete:RESTRICT"`
@@ -31,18 +31,18 @@ func (Payment) TableName() string {
 }
 
 type ExtraPayment struct {
-	ID              int64                 `gorm:"primaryKey" json:"id"`
-	BookingID       int64                 `gorm:"uniqueIndex;not null" json:"bookingID"`
-	UserID          int64                 `gorm:"not null;index" json:"userID"`
-	PaymentProvider *enum.PaymentProvider `gorm:"type:varchar(50);not null" json:"paymentProvider"`
-	PaymentMethod   *enum.PaymentMethod   `gorm:"type:varchar(50);not null" json:"paymentMethod"`
-	PaymentStatus   enum.PaymentStatus    `gorm:"type:varchar(20);not null" json:"paymentStatus"`
-	Amount          decimal.Decimal       `gorm:"type:decimal(10,2);not null" json:"amount"`
-	Currency        string                `gorm:"type:varchar(10);default:'TWD'" json:"currency"`
-	TransactionID   *string               `gorm:"type:varchar(100)" json:"transactionID"`
-	PaymentURL      string                `gorm:"type:text" json:"paymentURL"`
-	ExpiredAt       time.Time             `gorm:"not null" json:"expiredAt"`
-	PaidAt          *time.Time            `json:"paid_at,omitempty" json:"paidAt"`
+	ID            int64                 `gorm:"primaryKey" json:"id"`
+	BookingID     int64                 `gorm:"uniqueIndex;not null" json:"bookingID"`
+	UserID        int64                 `gorm:"not null;index" json:"userID"`
+	Provider      *enum.PaymentProvider `gorm:"type:varchar(50);not null" json:"provider"`
+	Method        *enum.PaymentMethod   `gorm:"type:varchar(50);not null" json:"method"`
+	Status        enum.PaymentStatus    `gorm:"type:varchar(20);not null" json:"status"`
+	Amount        decimal.Decimal       `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency      string                `gorm:"type:varchar(10);default:'TWD'" json:"currency"`
+	TransactionID *string               `gorm:"type:varchar(100)" json:"transactionID"`
+	PaymentURL    string                `gorm:"type:text" json:"paymentURL"`
+	ExpiredAt     time.Time             `gorm:"not null" json:"expiredAt"`
+	PaidAt        *time.Time            `json:"paid_at,omitempty" json:"paidAt"`
 
 	Booking Booking `gorm:"foreignKey:BookingID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	User    User    `gorm:"foreignKey:UserID;constraint:OnUpdate:RESTRICT,OnDelete:RESTRICT"`
@@ -52,4 +52,13 @@ type ExtraPayment struct {
 
 func (ExtraPayment) TableName() string {
 	return "extra_payment"
+}
+
+type PaymentUpdateResultCond struct {
+	ID            int64
+	TransactionID *string
+	Provider      *enum.PaymentProvider `gorm:"type:varchar(50);default null" json:"provider"`
+	Method        *enum.PaymentMethod   `gorm:"type:varchar(50);default null" json:"method"`
+	Status        enum.PaymentStatus
+	PaidAt        *time.Time
 }

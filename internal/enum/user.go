@@ -1,6 +1,6 @@
 package enum
 
-//go:generate enumer -type=UserStatus -trimprefix=UserStatus -yaml -json -text -sql -transform=snake --output=zzz_enumer_userStatus.go
+//go:generate enumer -type=UserStatus -trimprefix=UserStatus -yaml -json -text -sql -transform=snake --output=zzz_enumer_UserStatus.go
 type UserStatus int32
 
 const (

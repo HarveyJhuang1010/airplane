@@ -175,10 +175,6 @@ func (dao *BookingDao) list(cond *po.BookingListCond, pager *po.Pager) func(db *
 			db = db.Where("status IN (?)", cond.Status)
 		}
 
-		if !lo.IsNil(cond) && !lo.IsNil(cond.PaymentID) && !lo.IsEmpty(cond.PaymentID) {
-			db = db.Where("payment_id = ?", cond.PaymentID)
-		}
-
 		if pager == nil {
 			return db.Model(dao.model)
 		} else {

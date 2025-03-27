@@ -49,7 +49,7 @@ func (ctrl *Payment) NotifyPaymentResult(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctrl.in.Payment.PaymentWebhook.PaymentWebhook(ctx, cond); err != nil {
+	if err = ctrl.in.Payment.PaymentWebhook.PaymentWebhook(ctx, cond); err != nil {
 		return
 	}
 

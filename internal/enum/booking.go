@@ -5,9 +5,10 @@ type BookingStatus int32
 
 const (
 	BookingStatusPending BookingStatus = iota
+	BookingStatusConfirming
 	BookingStatusConfirmed
+	BookingStatusCanceling
 	BookingStatusCancelled
 	BookingStatusExpired
 	BookingStatusOverbooked
-	BookingStatusConfirming
 )

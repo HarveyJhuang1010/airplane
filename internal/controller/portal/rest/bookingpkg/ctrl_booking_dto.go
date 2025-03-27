@@ -27,6 +27,10 @@ type BookingResponse struct {
 	ExpiredAt        time.Time           `json:"expiredAt" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
+type AddBookingResponse struct {
+	ID int64 `json:"id"`
+}
+
 type AddBookingCond struct {
 	ID           int64  `json:"id"`
 	FlightID     int64  `json:"flightID"`

@@ -40,8 +40,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "allOf": [
                                 {
@@ -51,7 +51,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/bookingpkg.BookingResponse"
+                                            "$ref": "#/definitions/bookingpkg.AddBookingResponse"
                                         }
                                     }
                                 }
@@ -627,6 +627,14 @@ const docTemplate = `{
                 }
             }
         },
+        "bookingpkg.AddBookingResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "bookingpkg.BookingResponse": {
             "type": "object",
             "properties": {
@@ -816,11 +824,7 @@ const docTemplate = `{
                     "type": "string",
                     "example": "0"
                 },
-                "paidAt": {
-                    "description": "Paid time",
-                    "type": "string"
-                },
-                "paymentMethod": {
+                "method": {
                     "description": "Payment Method",
                     "type": "string",
                     "enum": [
@@ -829,7 +833,11 @@ const docTemplate = `{
                         "bank_transfer"
                     ]
                 },
-                "paymentProvider": {
+                "paidAt": {
+                    "description": "Paid time",
+                    "type": "string"
+                },
+                "provider": {
                     "description": "Payment Provider",
                     "type": "string",
                     "enum": [
@@ -840,7 +848,7 @@ const docTemplate = `{
                         "google_pay"
                     ]
                 },
-                "paymentStatus": {
+                "status": {
                     "description": "Payment Status",
                     "type": "string",
                     "enum": [

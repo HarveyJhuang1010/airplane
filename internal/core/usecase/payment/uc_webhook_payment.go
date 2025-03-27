@@ -4,7 +4,6 @@ import (
 	"airplane/internal/constant"
 	"airplane/internal/core/repositories/rdb"
 	"airplane/internal/domain/entities/bo"
-	"airplane/internal/domain/entities/po"
 	"airplane/internal/errs"
 	"airplane/internal/tools/timelogger"
 	"context"
@@ -25,21 +24,20 @@ func (uc *PaymentWebhook) PaymentWebhook(ctx context.Context, cond *bo.ConfirmPa
 	defer timelogger.LogTime(ctx)()
 
 	return uc.in.DBRepository.Master().Transaction(func(tx *rdb.Database) error {
+		// get payment
+		payment, err := tx.PaymentDAO().Get(ctx, cond.ID, true)
+		if err != nil {
+			uc.in.Logger.AppLogger.Error(ctx, err)
+			return err
+		}
+
 		if err := uc.in.PaymentBusiness.ConfirmPayment.ConfirmPayment(ctx, tx, cond); err != nil {
 			uc.in.Logger.AppLogger.Error(ctx, err)
 			return err
 		}
 
-		booking, err := tx.BookingDAO().List(ctx, &po.BookingListCond{
-			PaymentID: &cond.ID,
-		})
-		if err != nil || len(booking) == 0 {
-			uc.in.Logger.AppLogger.Error(ctx, err)
-			return err
-		}
-
 		msgCond := &bo.ConfirmBookingCond{
-			ID: booking[0].ID,
+			ID: payment.BookingID,
 		}
 
 		msgVal, err := json.Marshal(msgCond)

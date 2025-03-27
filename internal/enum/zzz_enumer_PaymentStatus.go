@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-const _PaymentStatusName = "pendingsuccessfailedcancelled"
+const _PaymentStatusName = "pendingsuccessfailedcancelledrefundingrefunded"
 
-var _PaymentStatusIndex = [...]uint8{0, 7, 14, 20, 29}
+var _PaymentStatusIndex = [...]uint8{0, 7, 14, 20, 29, 38, 46}
 
-const _PaymentStatusLowerName = "pendingsuccessfailedcancelled"
+const _PaymentStatusLowerName = "pendingsuccessfailedcancelledrefundingrefunded"
 
 func (i PaymentStatus) String() string {
 	if i < 0 || i >= PaymentStatus(len(_PaymentStatusIndex)-1) {
@@ -30,9 +30,11 @@ func _PaymentStatusNoOp() {
 	_ = x[PaymentStatusSuccess-(1)]
 	_ = x[PaymentStatusFailed-(2)]
 	_ = x[PaymentStatusCancelled-(3)]
+	_ = x[PaymentStatusRefunding-(4)]
+	_ = x[PaymentStatusRefunded-(5)]
 }
 
-var _PaymentStatusValues = []PaymentStatus{PaymentStatusPending, PaymentStatusSuccess, PaymentStatusFailed, PaymentStatusCancelled}
+var _PaymentStatusValues = []PaymentStatus{PaymentStatusPending, PaymentStatusSuccess, PaymentStatusFailed, PaymentStatusCancelled, PaymentStatusRefunding, PaymentStatusRefunded}
 
 var _PaymentStatusNameToValueMap = map[string]PaymentStatus{
 	_PaymentStatusName[0:7]:        PaymentStatusPending,
@@ -43,6 +45,10 @@ var _PaymentStatusNameToValueMap = map[string]PaymentStatus{
 	_PaymentStatusLowerName[14:20]: PaymentStatusFailed,
 	_PaymentStatusName[20:29]:      PaymentStatusCancelled,
 	_PaymentStatusLowerName[20:29]: PaymentStatusCancelled,
+	_PaymentStatusName[29:38]:      PaymentStatusRefunding,
+	_PaymentStatusLowerName[29:38]: PaymentStatusRefunding,
+	_PaymentStatusName[38:46]:      PaymentStatusRefunded,
+	_PaymentStatusLowerName[38:46]: PaymentStatusRefunded,
 }
 
 var _PaymentStatusNames = []string{
@@ -50,6 +56,8 @@ var _PaymentStatusNames = []string{
 	_PaymentStatusName[7:14],
 	_PaymentStatusName[14:20],
 	_PaymentStatusName[20:29],
+	_PaymentStatusName[29:38],
+	_PaymentStatusName[38:46],
 }
 
 // PaymentStatusString retrieves an enum value from the enum constants string name.

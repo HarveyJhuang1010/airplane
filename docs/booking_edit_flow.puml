@@ -1,41 +1,66 @@
+
 @startuml
 actor User
-participant "nginx (gateway)" as NGINX
-participant "booking_service" as BookingAPI
-participant "mysql" as MySQL
-participant "payment_service" as Payment
+User -> BookingService: EditBooking
+activate BookingService
 
-== Step 1: User sends edit request ==
-User -> NGINX: PATCH /booking/:id
-NGINX -> BookingAPI: EditBooking(cond)
+BookingService -> BookingDAO: Get(booking.ID)
+activate BookingDAO
+BookingDAO -> BookingService: Return booking
+deactivate BookingDAO
 
-== Step 2: Booking service validates and fetches booking ==
-BookingAPI -> MySQL: Get Booking by ID
-MySQL --> BookingAPI: Booking
+alt Booking.Status is Cancelled, Expired, Confirming
+    BookingService -> User: Error - Status Not Match
+    deactivate BookingService
+else SeatID has not changed
+    BookingService -> User: No Change Required
+    deactivate BookingService
+else SeatID has changed
+    BookingService -> SeatDAO: Get(cond.SeatID)
+    activate SeatDAO
+    SeatDAO -> BookingService: Return new seat
+    deactivate SeatDAO
 
-alt status != Confirmed or Overbooked
-    BookingAPI --> User: 400 StatusNotMatch
-else
-    BookingAPI -> MySQL: Get New Seat by Seat ID
-    BookingAPI -> MySQL: Get New Class by Class ID
-    alt newSeat not available or mismatched cabin
-        BookingAPI --> User: 400 Bad Request
+    BookingService -> CabinClassDAO: Get(cond.CabinClassID)
+    activate CabinClassDAO
+    CabinClassDAO -> BookingService: Return new class
+    deactivate CabinClassDAO
+
+    BookingService -> PaymentDAO: GetByBookingID(booking.ID)
+    activate PaymentDAO
+    PaymentDAO -> BookingService: Return payment
+    deactivate PaymentDAO
+
+    alt Booking.Status == Pending
+        BookingService -> PaymentDAO: UpdateAmount(payment.ID, newClass.Price)
+        activate PaymentDAO
+        PaymentDAO -> BookingService: Updated
+        deactivate PaymentDAO
+    else Booking.Price != newClass.Price
+        BookingService -> ExtraPaymentDAO: Create(extraPayment)
+        activate ExtraPaymentDAO
+        ExtraPaymentDAO -> BookingService: Extra Payment Created
+        deactivate ExtraPaymentDAO
+
+        BookingService -> SeatDAO: Update(newSeat.ID, Status.Held)
+        activate SeatDAO
+        SeatDAO -> BookingService: Seat Updated
+        deactivate SeatDAO
+        BookingService -> BookingService: Set Booking.Status to Confirming
     else
-        alt Price changed
-            BookingAPI -> MySQL: Get Payment by Booking ID
-            BookingAPI -> MySQL: Create Extra Payment
-            BookingAPI -> MySQL: Update Seat Status to Held
-            BookingAPI -> MySQL: Update Booking Status to Confirming
-        else
-            BookingAPI -> MySQL: Update Seat Status to Booked
-            BookingAPI -> MySQL: Update Booking Status to Confirmed
-        end
+        BookingService -> SeatDAO: Update(newSeat.ID, Status.Booked)
+        activate SeatDAO
+        SeatDAO -> BookingService: Seat Updated
+        deactivate SeatDAO
+        BookingService -> BookingService: Set Booking.Status to Confirmed
     end
+
+    BookingService -> BookingDAO: UpdateSeat(booking.ID, newSeat.ID, newClass.ID, newClass.Price)
+    activate BookingDAO
+    BookingDAO -> BookingService: Booking Updated
+    deactivate BookingDAO
+    BookingService -> User: Booking Edited Successfully
 end
 
-== Step 3: Booking Service returns updated booking ==
-BookingAPI -> MySQL: BookingDAO().Get(id)
-MySQL --> BookingAPI: Booking
-BookingAPI --> NGINX: BookingResponse
-NGINX --> User: BookingResponse
+deactivate BookingService
 @enduml

@@ -135,6 +135,24 @@ func (uc *AddBooking) HandleBooking(ctx context.Context, data []byte) error {
 		}
 		booking.Price = class.Price
 
+		// check seat
+		if cond.SeatID != nil {
+			seat, err := tx.SeatDAO().Get(ctx, *cond.SeatID, false)
+			if err != nil {
+				uc.in.Logger.AppLogger.Error(ctx, err)
+				if errors.Is(err, errs.ErrRecordNotFound) {
+					return errs.ErrDBQueryFailed
+				}
+				return err
+			}
+			if seat.Status != enum.SeatStatusAvailable {
+				return errs.ErrSeatNotAvailable
+			}
+			if seat.CabinClassID != class.ID {
+				return errs.ErrInvalidPayload
+			}
+		}
+
 		// handle user
 		userID, err := uc.in.User.GetUser.GetUser(ctx, cond.Email, cond.CountryCode, cond.PhoneNumber)
 		if err != nil {
@@ -143,17 +161,18 @@ func (uc *AddBooking) HandleBooking(ctx context.Context, data []byte) error {
 		}
 		booking.UserID = userID
 
-		// handle payment
-		if _, err := uc.in.Payment.CreatePayment.CreatePayment(ctx, tx, &bo.CreatePaymentCond{
-			BookingID: booking.ID,
-			Amount:    booking.Price,
-		}); err != nil {
-			uc.in.Logger.AppLogger.Error(ctx, err)
+		// create booking
+		if err := tx.BookingDAO().Create(ctx, booking); err != nil {
 			return err
 		}
 
-		// create booking
-		if err := tx.BookingDAO().Create(ctx, booking); err != nil {
+		// handle payment
+		if _, err := uc.in.Payment.CreatePayment.CreatePayment(ctx, tx, &bo.CreatePaymentCond{
+			BookingID: booking.ID,
+			UserID:    userID,
+			Amount:    booking.Price,
+		}); err != nil {
+			uc.in.Logger.AppLogger.Error(ctx, err)
 			return err
 		}
 

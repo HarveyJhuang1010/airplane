@@ -18,9 +18,10 @@ VALUES
 -- Insert sample seat
 INSERT INTO seat (id, flight_id, cabin_class_id, seat_number, status, created_at, updated_at)
 VALUES
-(4001, 2001, 3001, '12A', 'available', NOW(), NOW()),
+(4001, 2001, 3001, '12A', 'booked', NOW(), NOW()),
 (4002, 2001, 3001, '12B', 'available', NOW(), NOW()),
-(4003, 2001, 3002, '2A', 'available', NOW(), NOW());
+(4003, 2001, 3002, '2A', 'available', NOW(), NOW()),
+(4004, 2001, 3002, '3A', 'available', NOW(), NOW());
 
 -- Insert sample booking
 INSERT INTO booking (id, flight_id, user_id, cabin_class_id, seat_id, status, price, expired_at, created_at, updated_at)
@@ -28,28 +29,27 @@ VALUES
 (5001, 2001, 1001, 3001, 4001, 'confirmed', 7800.00, DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
 
 -- Insert sample payment
-INSERT INTO payment (id, booking_id, user_id, payment_provider, payment_method, payment_status, amount, currency, transaction_id, payment_url, expired_at, created_at, updated_at)
+INSERT INTO payment (id, booking_id, user_id, provider, method, status, amount, currency, transaction_id, payment_url, expired_at, created_at, updated_at)
 VALUES
 (6001, 5001, 1001, 'stripe', 'credit_card', 'success', 7800.00, 'TWD', 'TX123456789', 'https://pay.example.com/tx/123', DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
 
 -- Insert another booking that fills the seat
 INSERT INTO booking (id, flight_id, user_id, cabin_class_id, seat_id, status, price, expired_at, created_at, updated_at)
 VALUES
-(5002, 2001, 1002, 3001, 4002, 'confirmed', 7800.00, DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
+(5002, 2001, 1002, 3001, 4002, 'pending', 7800.00, DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
+
+-- Insert sample payment
+INSERT INTO payment (id, booking_id, user_id, provider, method, status, amount, currency, transaction_id, payment_url, expired_at, created_at, updated_at)
+VALUES
+    (6002, 5002, 1002, NULL, NULL, 'pending', 7800.00, 'TWD', NULL, 'https://pay.example.com/tx/6002', DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
 
 -- Simulate overbooking (no seat left)
 INSERT INTO booking (id, flight_id, user_id, cabin_class_id, seat_id, status, price, expired_at, created_at, updated_at)
 VALUES
 (5003, 2001, 1002, 3001, NULL, 'overbooked', 7800.00, DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
 
--- Later someone cancels, seat is released (assume ID 4004 exists)
--- We reassign the seat to the overbooked booking to simulate waitlist processing
--- (simulate manually here, system would normally do this automatically)
-UPDATE booking
-SET seat_id = 4001, status = 'confirmed', updated_at = NOW()
-WHERE id = 5003;
+-- Insert sample payment
+INSERT INTO payment (id, booking_id, user_id, provider, method, status, amount, currency, transaction_id, payment_url, expired_at, created_at, updated_at)
+VALUES
+    (6003, 5003, 1002, 'stripe', 'credit_card', 'success', 7800.00, 'TWD', 'TX323456789', 'https://pay.example.com/tx/6003', DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW());
 
--- Mark seat 4001 as Booked
-UPDATE seat
-SET status = 'booked', updated_at = NOW()
-WHERE id = 4001;

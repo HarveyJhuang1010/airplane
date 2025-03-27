@@ -37,8 +37,8 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "allOf": [
                                 {
@@ -48,7 +48,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/bookingpkg.BookingResponse"
+                                            "$ref": "#/definitions/bookingpkg.AddBookingResponse"
                                         }
                                     }
                                 }
@@ -624,6 +624,14 @@
                 }
             }
         },
+        "bookingpkg.AddBookingResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "bookingpkg.BookingResponse": {
             "type": "object",
             "properties": {
@@ -813,11 +821,7 @@
                     "type": "string",
                     "example": "0"
                 },
-                "paidAt": {
-                    "description": "Paid time",
-                    "type": "string"
-                },
-                "paymentMethod": {
+                "method": {
                     "description": "Payment Method",
                     "type": "string",
                     "enum": [
@@ -826,7 +830,11 @@
                         "bank_transfer"
                     ]
                 },
-                "paymentProvider": {
+                "paidAt": {
+                    "description": "Paid time",
+                    "type": "string"
+                },
+                "provider": {
                     "description": "Payment Provider",
                     "type": "string",
                     "enum": [
@@ -837,7 +845,7 @@
                         "google_pay"
                     ]
                 },
-                "paymentStatus": {
+                "status": {
                     "description": "Payment Status",
                     "type": "string",
                     "enum": [

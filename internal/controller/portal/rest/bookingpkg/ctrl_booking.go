@@ -27,7 +27,7 @@ type Booking struct {
 // @Accept 		json
 // @Produce		json
 // @Param 		params body AddBookingCond true "Request Body"
-// @Success 	200 {object} apis.StandardResponse{data=BookingResponse}
+// @Success 	201 {object} apis.StandardResponse{data=AddBookingResponse}
 // @Failure 	400 {object} apis.StandardResponse{error=apis.StandardError}
 // @Failure 	500 {object} apis.StandardResponse{error=apis.StandardError}
 // @Router 		/booking [post]
@@ -54,31 +54,7 @@ func (ctrl *Booking) AddBooking(ctx *gin.Context) {
 		return
 	}
 
-	booking, err := ctrl.in.Booking.GetBooking.GetBooking(ctx, cond.ID)
-	if err != nil {
-		return
-	}
-
-	ctrl.Response.Data(ctx, ctrl.in.StandardData().OK(&BookingResponse{
-		ID:               booking.ID,
-		AirlineCode:      booking.Flight.AirlineCode,
-		FlightNumber:     booking.Flight.FlightNumber,
-		DepartureAirport: booking.Flight.DepartureAirport,
-		ArrivalAirport:   booking.Flight.ArrivalAirport,
-		DepartureTime:    booking.Flight.DepartureTime,
-		ArrivalTime:      booking.Flight.ArrivalTime,
-		Email:            booking.User.Email,
-		PhoneCountryCode: booking.User.PhoneCountryCode,
-		PhoneNumber:      booking.User.PhoneNumber,
-		ClassCode:        booking.Class.ClassCode,
-		BaggageAllowance: booking.Class.BaggageAllowance,
-		Refundable:       booking.Class.Refundable,
-		SeatSelection:    booking.Class.SeatSelection,
-		SeatNumber:       lo.Ternary(lo.IsNil(booking.Seat), booking.Seat.SeatNumber, ""),
-		Status:           booking.Status,
-		Price:            booking.Price,
-		ExpiredAt:        booking.ExpiredAt,
-	}))
+	ctrl.Response.Data(ctx, ctrl.in.StandardData().Created(&AddBookingResponse{ID: cond.ID}))
 }
 
 // GetBooking
@@ -126,7 +102,7 @@ func (ctrl *Booking) GetBooking(ctx *gin.Context) {
 		BaggageAllowance: booking.Class.BaggageAllowance,
 		Refundable:       booking.Class.Refundable,
 		SeatSelection:    booking.Class.SeatSelection,
-		SeatNumber:       lo.Ternary(lo.IsNil(booking.Seat), booking.Seat.SeatNumber, ""),
+		SeatNumber:       lo.Ternary(!lo.IsNil(booking.Seat), booking.Seat.SeatNumber, ""),
 		Status:           booking.Status,
 		Price:            booking.Price,
 		ExpiredAt:        booking.ExpiredAt,
@@ -158,7 +134,7 @@ func (ctrl *Booking) CancelBooking(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctrl.in.Booking.CancelBooking.CancelBooking(ctx, dto.ID); err != nil {
+	if err = ctrl.in.Booking.CancelBooking.CancelBooking(ctx, dto.ID); err != nil {
 		return
 	}
 
@@ -196,7 +172,7 @@ func (ctrl *Booking) EditBooking(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctrl.in.Booking.EditBooking.EditBooking(ctx, cond); err != nil {
+	if err = ctrl.in.Booking.EditBooking.EditBooking(ctx, cond); err != nil {
 		return
 	}
 
@@ -220,7 +196,7 @@ func (ctrl *Booking) EditBooking(ctx *gin.Context) {
 		BaggageAllowance: booking.Class.BaggageAllowance,
 		Refundable:       booking.Class.Refundable,
 		SeatSelection:    booking.Class.SeatSelection,
-		SeatNumber:       lo.Ternary(lo.IsNil(booking.Seat), booking.Seat.SeatNumber, ""),
+		SeatNumber:       lo.Ternary(!lo.IsNil(booking.Seat), booking.Seat.SeatNumber, ""),
 		Status:           booking.Status,
 		Price:            booking.Price,
 		ExpiredAt:        booking.ExpiredAt,

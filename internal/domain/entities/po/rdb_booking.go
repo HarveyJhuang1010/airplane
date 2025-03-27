@@ -30,10 +30,9 @@ func (Booking) TableName() string {
 
 type BookingListCond struct {
 	*Pager
-	FlightID  *int64
-	UserID    *int64
-	PaymentID *int64
-	Status    []enum.BookingStatus
+	FlightID *int64
+	UserID   *int64
+	Status   []enum.BookingStatus
 }
 
 type BookingUpdateCond struct {

@@ -8,6 +8,7 @@ import (
 
 type CreatePaymentCond struct {
 	BookingID int64
+	UserID    int64
 	Amount    decimal.Decimal
 }
 
@@ -15,9 +16,9 @@ type Payment struct {
 	ID              int64                 `json:"id"`
 	BookingID       int64                 `json:"bookingID"`
 	UserID          int64                 `json:"userID"`
-	PaymentProvider *enum.PaymentProvider `json:"paymentProvider"`
-	PaymentMethod   *enum.PaymentMethod   `json:"paymentMethod"`
-	PaymentStatus   enum.PaymentStatus    `json:"paymentStatus"`
+	PaymentProvider *enum.PaymentProvider `json:"provider"`
+	PaymentMethod   *enum.PaymentMethod   `json:"method"`
+	PaymentStatus   enum.PaymentStatus    `json:"status"`
 	Amount          decimal.Decimal       `json:"amount"`
 	Currency        string                `json:"currency"`
 	TransactionID   *string               `json:"transactionID"`
@@ -27,10 +28,10 @@ type Payment struct {
 }
 
 type ConfirmPaymentCond struct {
-	ID              int64                 `json:"id"`
-	TransactionID   *string               `json:"transactionID"`
-	PaymentProvider *enum.PaymentProvider `json:"paymentProvider"`
-	PaymentMethod   *enum.PaymentMethod   `json:"paymentMethod"`
-	PaymentStatus   enum.PaymentStatus    `json:"paymentStatus"`
-	PaidAt          *time.Time            `json:"paidAt"`
+	ID            int64                 `json:"id"`
+	TransactionID *string               `json:"transactionID"`
+	Provider      *enum.PaymentProvider `json:"provider"`
+	Method        *enum.PaymentMethod   `json:"method"`
+	Status        enum.PaymentStatus    `json:"status"`
+	PaidAt        *time.Time            `json:"paidAt"`
 }
